@@ -30,26 +30,26 @@ export default function AuthModal({ onClose }: AuthModalProps) {
   function handleRegister(e: React.FormEvent) {
     e.preventDefault();
     setError('');
-    if (!form.username.trim() || !form.email.trim() || !form.password) {
-      setError('Заполните все поля'); return;
+    if (!form.username.trim() || !form.password) {
+      setError('Введите логин и пароль'); return;
     }
     if (form.password !== form.confirm) { setError('Пароли не совпадают'); return; }
     if (form.password.length < 4) { setError('Пароль минимум 4 символа'); return; }
     const state = getState();
-    if (state.users.find(u => u.username === form.username)) {
+    if (state.users.find(u => u.username.toLowerCase() === form.username.trim().toLowerCase())) {
       setError('Такой логин уже занят'); return;
     }
-    if (state.users.find(u => u.email === form.email)) {
+    if (form.email.trim() && state.users.find(u => u.email && u.email.toLowerCase() === form.email.trim().toLowerCase())) {
       setError('Такой email уже зарегистрирован'); return;
     }
     const newUser: User = {
       id: generateId(),
-      username: form.username,
-      email: form.email,
+      username: form.username.trim(),
+      email: form.email.trim(),
       password: form.password,
       avatar: '',
       bio: '',
-      channelName: form.username,
+      channelName: form.username.trim(),
       subscribers: 0,
       createdAt: new Date().toISOString(),
     };
@@ -135,7 +135,7 @@ export default function AuthModal({ onClose }: AuthModalProps) {
             />
             <input
               type="email"
-              placeholder="Email"
+              placeholder="Email (необязательно)"
               value={form.email}
               onChange={e => setForm({ ...form, email: e.target.value })}
               className="w-full bg-secondary border border-border rounded-lg px-4 py-3 text-sm focus:outline-none focus:ring-2 focus:ring-red-500"
