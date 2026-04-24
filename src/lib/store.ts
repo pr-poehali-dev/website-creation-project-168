@@ -60,6 +60,7 @@ export interface AppState {
   favorites: string[];
   likedVideos: string[];
   dislikedVideos: string[];
+  viewedVideos: string[];
 }
 
 const CENSORED_WORDS = ['хуй', 'пизда', 'еб', 'блядь', 'сука', 'хуя', 'пиздец', 'нахуй', 'fuck', 'shit', 'ass', 'bitch', 'damn'];
@@ -87,6 +88,7 @@ const DEFAULT_STATE: AppState = {
   favorites: [],
   likedVideos: [],
   dislikedVideos: [],
+  viewedVideos: [],
 };
 
 function loadState(): AppState {

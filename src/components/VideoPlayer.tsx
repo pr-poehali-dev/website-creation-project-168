@@ -38,13 +38,20 @@ export default function VideoPlayer({ video, currentUser, onClose, onNav, onAuth
     if (viewCounted.current) return;
     viewCounted.current = true;
 
-    setState(s => ({
-      ...s,
-      videos: s.videos.map(x => x.id === video.id ? { ...x, views: x.views + 1 } : x),
-      history: currentUser
-        ? [video.id, ...s.history.filter(id => id !== video.id)].slice(0, 100)
-        : s.history,
-    }));
+    setState(s => {
+      const viewKey = currentUser ? `${currentUser.id}:${video.id}` : `guest:${video.id}`;
+      const alreadyViewed = s.viewedVideos.includes(viewKey);
+      return {
+        ...s,
+        videos: alreadyViewed
+          ? s.videos
+          : s.videos.map(x => x.id === video.id ? { ...x, views: x.views + 1 } : x),
+        viewedVideos: alreadyViewed ? s.viewedVideos : [...s.viewedVideos, viewKey],
+        history: currentUser
+          ? [video.id, ...s.history.filter(id => id !== video.id)].slice(0, 100)
+          : s.history,
+      };
+    });
   }, []);
 
   function togglePlay() {
