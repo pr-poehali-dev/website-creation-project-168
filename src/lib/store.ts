@@ -73,26 +73,7 @@ export function censorText(text: string): string {
   return result;
 }
 
-const DEMO_VIDEOS: Video[] = [
-  {
-    id: 'demo1',
-    title: 'Добро пожаловать на Ювист!',
-    description: 'Это демонстрационное видео. Загружайте свои видео и делитесь ими с миром!',
-    url: 'https://www.w3schools.com/html/mov_bbb.mp4',
-    thumbnail: 'https://images.unsplash.com/photo-1611532736597-de2d4265fba3?w=640&q=80',
-    authorId: 'system',
-    authorName: 'Ювист',
-    authorAvatar: '',
-    views: 1024,
-    likes: 87,
-    dislikes: 3,
-    comments: [],
-    tags: ['ювист', 'видео', 'добро пожаловать'],
-    isAdult: false,
-    duration: '0:09',
-    createdAt: new Date().toISOString(),
-  }
-];
+const DEMO_VIDEOS: Video[] = [];
 
 const DEFAULT_STATE: AppState = {
   users: [],
@@ -113,9 +94,7 @@ function loadState(): AppState {
     const raw = localStorage.getItem('yuvist_state');
     if (!raw) return DEFAULT_STATE;
     const parsed = JSON.parse(raw);
-    if (!parsed.videos || parsed.videos.length === 0) {
-      parsed.videos = DEMO_VIDEOS;
-    }
+    parsed.videos = (parsed.videos || []).filter((v: Video) => v.authorId !== 'system');
     return { ...DEFAULT_STATE, ...parsed };
   } catch {
     return DEFAULT_STATE;
