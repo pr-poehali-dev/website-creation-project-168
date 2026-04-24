@@ -19,8 +19,9 @@ export default function ProfilePage({ currentUser, onAuth, onWatch, onShowAccoun
     channelName: currentUser?.channelName || '',
     bio: currentUser?.bio || '',
     avatar: currentUser?.avatar || '',
-    cardNumber: currentUser?.cardNumber || '',
+    donateQr: currentUser?.donateQr || '',
   });
+  const [qrFile, setQrFile] = useState<string | null>(currentUser?.donateQr || null);
 
   if (!currentUser) {
     return (
@@ -44,11 +45,23 @@ export default function ProfilePage({ currentUser, onAuth, onWatch, onShowAccoun
   const totalViews = myVideos.reduce((sum, v) => sum + v.views, 0);
   const totalLikes = myVideos.reduce((sum, v) => sum + v.likes, 0);
 
+  function handleQrFile(e: React.ChangeEvent<HTMLInputElement>) {
+    const file = e.target.files?.[0];
+    if (!file) return;
+    const reader = new FileReader();
+    reader.onload = ev => {
+      const result = ev.target?.result as string;
+      setQrFile(result);
+      setForm(f => ({ ...f, donateQr: result }));
+    };
+    reader.readAsDataURL(file);
+  }
+
   function saveProfile() {
     setState(s => ({
       ...s,
       users: s.users.map(u => u.id === currentUser.id
-        ? { ...u, channelName: form.channelName, bio: form.bio, avatar: form.avatar, cardNumber: form.cardNumber }
+        ? { ...u, channelName: form.channelName, bio: form.bio, avatar: form.avatar, donateQr: form.donateQr }
         : u
       )
     }));
@@ -143,15 +156,35 @@ export default function ProfilePage({ currentUser, onAuth, onWatch, onShowAccoun
               )}
             </div>
             <div>
-              <label className="text-sm font-medium mb-1.5 block">Номер карты (для спонсирования)</label>
-              <input
-                type="text"
-                value={form.cardNumber}
-                onChange={e => setForm({ ...form, cardNumber: e.target.value })}
-                placeholder="0000 0000 0000 0000"
-                maxLength={19}
-                className="w-full bg-secondary border border-border rounded-lg px-4 py-3 text-sm focus:outline-none focus:ring-2 focus:ring-red-500/50"
-              />
+              <label className="text-sm font-medium mb-1.5 block">QR-код для донатов</label>
+              <input type="file" accept="image/*" id="qr-upload" onChange={handleQrFile} className="hidden" />
+              {qrFile ? (
+                <div className="flex items-center gap-3 p-3 bg-secondary rounded-xl border border-border">
+                  <img src={qrFile} className="w-16 h-16 object-contain rounded-lg bg-white p-1" alt="QR" />
+                  <div className="flex-1">
+                    <p className="text-sm font-medium">QR-код загружен</p>
+                    <p className="text-xs text-muted-foreground">Будет показан под вашими видео</p>
+                  </div>
+                  <button
+                    type="button"
+                    onClick={() => { setQrFile(null); setForm(f => ({ ...f, donateQr: '' })); }}
+                    className="p-1.5 text-muted-foreground hover:text-red-400 transition-colors"
+                  >
+                    <Icon name="X" size={16} />
+                  </button>
+                </div>
+              ) : (
+                <label
+                  htmlFor="qr-upload"
+                  className="w-full flex items-center gap-3 p-4 border-2 border-dashed border-border rounded-xl cursor-pointer hover:border-red-500/50 hover:bg-secondary/50 transition-all"
+                >
+                  <Icon name="QrCode" size={22} className="text-muted-foreground" />
+                  <div>
+                    <p className="text-sm font-medium">Загрузить QR-код</p>
+                    <p className="text-xs text-muted-foreground">PNG, JPG — скриншот QR вашего банка</p>
+                  </div>
+                </label>
+              )}
             </div>
             <div className="flex gap-3">
               <button

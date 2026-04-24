@@ -7,7 +7,7 @@ export interface User {
   bio: string;
   channelName: string;
   subscribers: number;
-  cardNumber?: string;
+  donateQr?: string;
   createdAt: string;
 }
 

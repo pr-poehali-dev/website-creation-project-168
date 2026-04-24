@@ -40,7 +40,7 @@ export default function UploadModal({ currentUser, onClose, onSuccess }: UploadM
     const file = e.target.files?.[0];
     if (!file) return;
     if (!file.type.startsWith('video/')) { setError('Выберите видео-файл'); return; }
-    if (file.size > 500 * 1024 * 1024) { setError('Файл слишком большой (макс. 500 МБ)'); return; }
+    if (file.size > 2 * 1024 * 1024 * 1024) { setError('Файл слишком большой (макс. 2 ГБ)'); return; }
     setError('');
     setVideoFile(file);
     const url = URL.createObjectURL(file);
@@ -157,7 +157,7 @@ export default function UploadModal({ currentUser, onClose, onSuccess }: UploadM
                     </div>
                     <div className="text-center">
                       <p className="font-medium text-sm">Нажмите, чтобы выбрать файл</p>
-                      <p className="text-xs text-muted-foreground mt-1">MP4, MOV, AVI, MKV · до 500 МБ</p>
+                      <p className="text-xs text-muted-foreground mt-1">MP4, MOV, AVI, MKV · до 2 ГБ</p>
                     </div>
                   </button>
                 ) : (

@@ -361,18 +361,30 @@ export default function VideoPlayer({ video, currentUser, onClose, onNav, onAuth
                 </div>
               )}
 
-              <div className="mt-4 p-3 bg-secondary rounded-xl border border-border">
-                <button
-                  onClick={() => { if (!currentUser) { onAuth(); return; } setSponsored(!sponsored); }}
-                  className="w-full flex items-center justify-center gap-2 py-1 text-sm font-semibold text-yellow-400 hover:text-yellow-300 transition-colors"
-                >
-                  <Icon name="Star" size={16} />
-                  Спонсировать автора
-                  {authorUser?.cardNumber && sponsored && (
-                    <span className="ml-2 text-xs text-muted-foreground">Карта: **** {authorUser.cardNumber.slice(-4)}</span>
+              {!isOwner && (
+                <div className="mt-4 rounded-xl border border-yellow-500/30 overflow-hidden">
+                  <button
+                    onClick={() => { if (!currentUser) { onAuth(); return; } setSponsored(!sponsored); }}
+                    className="w-full flex items-center justify-center gap-2 px-4 py-3 text-sm font-semibold text-yellow-400 hover:text-yellow-300 bg-yellow-500/5 hover:bg-yellow-500/10 transition-colors"
+                  >
+                    <Icon name="Star" size={16} />
+                    Спонсировать автора
+                    <Icon name={sponsored ? 'ChevronUp' : 'ChevronDown'} size={15} />
+                  </button>
+                  {sponsored && (
+                    <div className="p-4 bg-yellow-500/5 border-t border-yellow-500/20 flex flex-col items-center gap-3 animate-fade-in">
+                      {authorUser?.donateQr ? (
+                        <>
+                          <p className="text-xs text-muted-foreground">Отсканируйте QR-код для перевода автору</p>
+                          <img src={authorUser.donateQr} alt="QR-код для доната" className="w-36 h-36 object-contain rounded-xl bg-white p-2" />
+                        </>
+                      ) : (
+                        <p className="text-xs text-muted-foreground py-2">Автор ещё не добавил QR-код для донатов</p>
+                      )}
+                    </div>
                   )}
-                </button>
-              </div>
+                </div>
+              )}
 
               <div className="mt-6">
                 <h3 className="font-semibold mb-4">Комментарии · {v.comments.length}</h3>
