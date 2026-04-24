@@ -24,7 +24,7 @@ export default function VideoPlayer({ video, currentUser, onClose, onNav, onAuth
   const [showPlaylistModal, setShowPlaylistModal] = useState(false);
   const [playlistName, setPlaylistName] = useState('');
   const [sponsored, setSponsored] = useState(false);
-  const [addedToHistory, setAddedToHistory] = useState(false);
+  const viewCounted = useRef(false);
 
   const v = state.videos.find(x => x.id === video.id) || video;
   const isLiked = currentUser ? state.likedVideos.includes(v.id) : false;
@@ -35,16 +35,15 @@ export default function VideoPlayer({ video, currentUser, onClose, onNav, onAuth
   const isSubscribed = currentUser && state.subscriptions.includes(v.authorId);
 
   useEffect(() => {
-    if (!addedToHistory && currentUser) {
-      setState(s => ({
-        ...s,
-        history: [v.id, ...s.history.filter(id => id !== v.id)].slice(0, 100)
-      }));
-      setAddedToHistory(true);
-    }
+    if (viewCounted.current) return;
+    viewCounted.current = true;
+
     setState(s => ({
       ...s,
-      videos: s.videos.map(x => x.id === v.id ? { ...x, views: x.views + 1 } : x)
+      videos: s.videos.map(x => x.id === video.id ? { ...x, views: x.views + 1 } : x),
+      history: currentUser
+        ? [video.id, ...s.history.filter(id => id !== video.id)].slice(0, 100)
+        : s.history,
     }));
   }, []);
 
